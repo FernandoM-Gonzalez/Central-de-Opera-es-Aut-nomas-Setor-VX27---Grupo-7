@@ -44,21 +44,36 @@ int verificadorPadraoSetor(char setor[]){
         return 0;
     }
 
-    //Verifica se os 2 primeiros digitos são Caracteres
+    //Verifica se os 2 primeiros digitos não são Caracteres
     if(isdigit(setor[0]) || isdigit(setor[1])){
         return 0;
     }
 
-    //Verifica se os 2 ultimos digitos são Digitos Numéricos
+    //Verifica se os 2 ultimos digitos não são Digitos Numéricos
     if(!isdigit(setor[2]) || !isdigit(setor[3])){
         return 0;
     }
     return 1;
 }
 
+int verificadorNumero(char num[]){
+    //Verifica Tamanho da String
+    if(strlen(num) == 0 || strlen(num) > 10){
+        return 0;
+    }
+
+    //Verifica se não são Digitos Numéricos
+    for(int i = 0; i < strlen(num); i++){
+        if(!isdigit(num[i])){
+            return 0;
+        }
+    }
+    return 1;
+}
+
 void cadastroOperador(){
-    int verificador = 0,leitor = 0,idOperadorTemporario = 0,qtdOperacoesTemporario = 0;
-    char nomeOperadorTemporario[100],setorOperadorTemporario[6], nivelOperacionalTemporario[20],statusOperadorTemporario[10];
+    int verificador = 0,leitorNum = 0,idOperadorTemporario = 0,qtdOperacoesTemporario = 0;
+    char leitorStr[50],nomeOperadorTemporario[100],setorOperadorTemporario[6], nivelOperacionalTemporario[20],statusOperadorTemporario[10];
 
     do{
         printf("Nome do Operador: ");
@@ -76,9 +91,7 @@ void cadastroOperador(){
     verificador = 0;
 
     do{
-        printf("Um setor é composto por 2 Caracteres e 2 Números | Exemplo: TI01 \n");
-
-        printf("Setor do Operador: ");
+        printf("Um setor é composto por 2 Caracteres e 2 Números | Exemplo: TI01 \nSetor do Operador: ");
         fgets(setorOperadorTemporario,6,stdin);
 
         setorOperadorTemporario[strcspn(setorOperadorTemporario, "\n")] = '\0';
@@ -94,9 +107,9 @@ void cadastroOperador(){
 
     do{
         printf("[ 1 - Básico | 2 - Intermediário | 3 - Supervisor Técnico ]\n Nivel do Operador: ");
-        scanf("%d", &leitor );
+        scanf("%d", &leitorNum );
 
-        switch (leitor){
+        switch (leitorNum){
             case 1:
                 strcpy(nivelOperacionalTemporario, "Basico");
                 verificador = 1;
@@ -121,9 +134,9 @@ void cadastroOperador(){
 
     do{
         printf("[ 1 - Disponível | 2 - Ocupado | 3 - Inativo | 4 - Bloqueado ]\n Status do Operador: ");
-        scanf("%d", &leitor );
+        scanf("%d", &leitorNum);
 
-        switch (leitor){
+        switch (leitorNum){
             case 1:
                 strcpy(statusOperadorTemporario, "Disponivel");
                 verificador = 1;
@@ -144,6 +157,22 @@ void cadastroOperador(){
                 printf("Opcão Inválida. Tente novamente.\n\n");
                 verificador = 0;
                 break;
+        }
+    }while(verificador == 0);
+
+    verificador = 0;
+    limpaBuffer();
+
+    do{
+        printf("Quantidade de Operações Efetuadas pelo Operador: ");
+        fgets(leitorStr,50,stdin);
+
+        leitorStr[strcspn(leitorStr, "\n")] = '\0';
+
+        verificador = verificadorNumero(leitorStr);
+
+        if(verificador == 0){
+            printf("Opcão Inválida. Tente novamente.\n\n");
         }
     }while(verificador == 0);
 }
