@@ -71,6 +71,16 @@ int verificadorNumero(char num[]){
     return 1;
 }
 
+void inserirOperadorNaLista(struct Operador op){
+    for (int i = 0; i < TAM_LISTA; i++){
+        if(listaOperadores[i].idOperador == 0){
+            listaOperadores[i] = op;
+            break;
+        }
+    }
+    qtdOperadoresCadastrados++;
+}
+
 void cadastroOperador(){
     int verificador = 0,leitorNum = 0,idOperadorTemporario = 0,qtdOperacoesTemporario = 0;
     char leitorStr[50],nomeOperadorTemporario[100],setorOperadorTemporario[6], nivelOperacionalTemporario[20],statusOperadorTemporario[10];
@@ -124,6 +134,7 @@ void cadastroOperador(){
                 break;
             default:
                 printf("Opção Inválida. Tente novamente.\n\n");
+                limpaBuffer();
                 verificador = 0;
                 break;
         }
@@ -155,6 +166,7 @@ void cadastroOperador(){
                 break;
             default:
                 printf("Opcão Inválida. Tente novamente.\n\n");
+                limpaBuffer();
                 verificador = 0;
                 break;
         }
@@ -175,24 +187,45 @@ void cadastroOperador(){
             printf("Opcão Inválida. Tente novamente.\n\n");
         }
     }while(verificador == 0);
+
+    qtdOperacoesTemporario = atoi(leitorStr);
+    idOperadorTemporario = qtdOperadoresCadastrados;
+
+    struct Operador operadorTemporario;
+
+    operadorTemporario.idOperador = qtdOperadoresCadastrados;
+    operadorTemporario.qtdOperacoes = qtdOperacoesTemporario;
+    strcpy(operadorTemporario.nomeOperador, nomeOperadorTemporario);
+    strcpy(operadorTemporario.setorOperador, setorOperadorTemporario);
+    strcpy(operadorTemporario.nivelOperacional, nivelOperacionalTemporario);
+    strcpy(operadorTemporario.statusOperador, statusOperadorTemporario);
+
+    inserirOperadorNaLista(operadorTemporario);
 }
 
 int main(){
     setlocale(LC_ALL, "Portuguese");
 
-    struct Operador opOriginal = {
-        101,
-        42,
-        "Carlos Silva",
-        "TI",
-        "Pleno",
-        "Ativo"
-    };
-
-    listaOperadores[0] = opOriginal;
-    qtdOperadoresCadastrados = 1;
-
     cadastroOperador();
+    cadastroOperador();
+
+    printf("\n=== DEBUG: DADOS NA LISTA GLOBAL [0] ===\n");
+    printf("ID: %d\n", listaOperadores[0].idOperador);
+    printf("Nome: %s\n", listaOperadores[0].nomeOperador);
+    printf("Setor: %s\n", listaOperadores[0].setorOperador);
+    printf("Nivel: %s\n", listaOperadores[0].nivelOperacional);
+    printf("Status: %s\n", listaOperadores[0].statusOperador);
+    printf("Qtd Operacoes: %d\n", listaOperadores[0].qtdOperacoes);
+    printf("========================================\n\n");
+
+    printf("\n=== DEBUG: DADOS NA LISTA GLOBAL [1] ===\n");
+    printf("ID: %d\n", listaOperadores[1].idOperador);
+    printf("Nome: %s\n", listaOperadores[1].nomeOperador);
+    printf("Setor: %s\n", listaOperadores[1].setorOperador);
+    printf("Nivel: %s\n", listaOperadores[1].nivelOperacional);
+    printf("Status: %s\n", listaOperadores[1].statusOperador);
+    printf("Qtd Operacoes: %d\n", listaOperadores[1].qtdOperacoes);
+    printf("========================================\n\n");
 
     return 0;
 }
