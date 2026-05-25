@@ -6,11 +6,12 @@
 
 #include <locale.h>
 
-#define TAM_LISTA 100
+#define TAM_LISTA_OPERADORES 50
+#define TAM_LISTA_EQUIPAMENTOS 150
 
 struct Operador{
     int idOperador,qtdOperacoes;
-    char nomeOperador[100],setorOperador[6],nivelOperacional[20],statusOperador[10];
+    char nomeOperador[70],setorOperador[10],nivelOperacional[20],statusOperador[10];
 };
 
 struct Equipamento{
@@ -18,21 +19,34 @@ struct Equipamento{
     char idEquipamento[100], tipoEquipamento[20], setorEquipamento[6], estadoOperacional[10];
 };
 
-struct Operador listaOperadores[TAM_LISTA];
-struct Equipamento listaEquipamentos[TAM_LISTA];
-
-int qtdOperadoresCadastrados = 0;
+struct Informacoes{
+    int qtdOperadoresCadastrados;
+    struct Operador listaOperadores[TAM_LISTA_OPERADORES];
+    struct Equipamento listaEquipamentos[TAM_LISTA_EQUIPAMENTOS];
+};
 
 void limpaBuffer(void){
     int c = 0;
     while ((c = getchar()) != '\n' && c != EOF) {}
 }
 
-int verificadorNomeRepetido(char nome[]){
-    //Verifica se tem algum nome igual na Lista de Operadores já Cadastrados
-    for(int i = 0; i < qtdOperadoresCadastrados; i++){
-        if(strcmp(nome, listaOperadores[i].nomeOperador) == 0){
+struct Informacoes criarBancoDeDados(){
+    struct Informacoes info = {0};
+    return info;
+}
+
+int verificadorNomeRepetido(char nome[], struct Informacoes *info){
+    //Verifica Tamanho da String
+    if(strlen(nome) == 0 || strlen(nome) > 70){
             return 1;
+    }
+
+    //Verifica se tem algum nome igual na Lista de Operadores já Cadastrados
+    for(int i = 0; i < TAM_LISTA_OPERADORES; i++){
+        if(info->listaOperadores[i].idOperador != 0){
+            if(strcmp(nome, info->listaOperadores[i].nomeOperador) == 0){
+                return 1;
+            }
         }
     }
     return 0;
@@ -71,30 +85,32 @@ int verificadorNumero(char num[]){
     return 1;
 }
 
-void inserirOperadorNaLista(struct Operador op){
-    for (int i = 0; i < TAM_LISTA; i++){
-        if(listaOperadores[i].idOperador == 0){
-            listaOperadores[i] = op;
+void inserirOperadorNaLista(struct Operador op, struct Informacoes *info){
+    for (int i = 0; i < TAM_LISTA_OPERADORES; i++){
+        if(info->listaOperadores[i].idOperador == 0){
+            info->listaOperadores[i] = op;
+            info->qtdOperadoresCadastrados++;
             break;
         }
     }
-    qtdOperadoresCadastrados++;
 }
 
-void cadastroOperador(){
+void cadastroOperador(struct Informacoes *info){
     int verificador = 0,leitorNum = 0,idOperadorTemporario = 0,qtdOperacoesTemporario = 0;
-    char leitorStr[50],nomeOperadorTemporario[100],setorOperadorTemporario[6], nivelOperacionalTemporario[20],statusOperadorTemporario[10];
+    char leitorStr[50],nomeOperadorTemporario[70],setorOperadorTemporario[6], nivelOperacionalTemporario[20],statusOperadorTemporario[10];
+
+    printf("[* Cadastro de Operadores * ]\n");
 
     do{
         printf("Nome do Operador: ");
-        fgets(nomeOperadorTemporario,100,stdin);
+        fgets(nomeOperadorTemporario,70,stdin);
 
         nomeOperadorTemporario[strcspn(nomeOperadorTemporario, "\n")] = '\0';
 
-        verificador = verificadorNomeRepetido(nomeOperadorTemporario);
+        verificador = verificadorNomeRepetido(nomeOperadorTemporario, info);
 
         if(verificador == 1){
-            printf("Esse nome já foi cadastrado. Tente Novamente.\n\n");
+            printf("Esse nome já foi cadastrado ou Valor Inválido.\nTente Novamente.\n\n");
         }
     }while(verificador == 1);
 
@@ -102,7 +118,7 @@ void cadastroOperador(){
 
     do{
         printf("Um setor é composto por 2 Caracteres e 2 Números | Exemplo: TI01 \nSetor do Operador: ");
-        fgets(setorOperadorTemporario,6,stdin);
+        fgets(setorOperadorTemporario,10,stdin);
 
         setorOperadorTemporario[strcspn(setorOperadorTemporario, "\n")] = '\0';
 
@@ -117,7 +133,9 @@ void cadastroOperador(){
 
     do{
         printf("[ 1 - Básico | 2 - Intermediário | 3 - Supervisor Técnico ]\n Nivel do Operador: ");
-        scanf("%d", &leitorNum );
+        if(scanf("%d", &leitorNum) != 1){
+            leitorNum = 0;
+        }
 
         switch (leitorNum){
             case 1:
@@ -145,7 +163,9 @@ void cadastroOperador(){
 
     do{
         printf("[ 1 - Disponível | 2 - Ocupado | 3 - Inativo | 4 - Bloqueado ]\n Status do Operador: ");
-        scanf("%d", &leitorNum);
+        if(scanf("%d", &leitorNum) != 1){
+            leitorNum = 0;
+        }
 
         switch (leitorNum){
             case 1:
@@ -189,42 +209,44 @@ void cadastroOperador(){
     }while(verificador == 0);
 
     qtdOperacoesTemporario = atoi(leitorStr);
-    idOperadorTemporario = qtdOperadoresCadastrados;
+    idOperadorTemporario = info->qtdOperadoresCadastrados + 1;
 
     struct Operador operadorTemporario;
 
-    operadorTemporario.idOperador = qtdOperadoresCadastrados;
+    operadorTemporario.idOperador = idOperadorTemporario;
     operadorTemporario.qtdOperacoes = qtdOperacoesTemporario;
     strcpy(operadorTemporario.nomeOperador, nomeOperadorTemporario);
     strcpy(operadorTemporario.setorOperador, setorOperadorTemporario);
     strcpy(operadorTemporario.nivelOperacional, nivelOperacionalTemporario);
     strcpy(operadorTemporario.statusOperador, statusOperadorTemporario);
 
-    inserirOperadorNaLista(operadorTemporario);
+    inserirOperadorNaLista(operadorTemporario, info);
 }
 
 int main(){
     setlocale(LC_ALL, "Portuguese");
 
-    cadastroOperador();
-    cadastroOperador();
+    struct Informacoes bancoDeDados = criarBancoDeDados();
 
-    printf("\n=== DEBUG: DADOS NA LISTA GLOBAL [0] ===\n");
-    printf("ID: %d\n", listaOperadores[0].idOperador);
-    printf("Nome: %s\n", listaOperadores[0].nomeOperador);
-    printf("Setor: %s\n", listaOperadores[0].setorOperador);
-    printf("Nivel: %s\n", listaOperadores[0].nivelOperacional);
-    printf("Status: %s\n", listaOperadores[0].statusOperador);
-    printf("Qtd Operacoes: %d\n", listaOperadores[0].qtdOperacoes);
+    cadastroOperador(&bancoDeDados);
+    cadastroOperador(&bancoDeDados);
+
+    printf("\n=== DEBUG: DADOS NA LISTA [0] ===\n");
+    printf("ID: %d\n", bancoDeDados.listaOperadores[0].idOperador);
+    printf("Nome: %s\n", bancoDeDados.listaOperadores[0].nomeOperador);
+    printf("Setor: %s\n", bancoDeDados.listaOperadores[0].setorOperador);
+    printf("Nivel: %s\n", bancoDeDados.listaOperadores[0].nivelOperacional);
+    printf("Status: %s\n", bancoDeDados.listaOperadores[0].statusOperador);
+    printf("Qtd Operacoes: %d\n", bancoDeDados.listaOperadores[0].qtdOperacoes);
     printf("========================================\n\n");
 
-    printf("\n=== DEBUG: DADOS NA LISTA GLOBAL [1] ===\n");
-    printf("ID: %d\n", listaOperadores[1].idOperador);
-    printf("Nome: %s\n", listaOperadores[1].nomeOperador);
-    printf("Setor: %s\n", listaOperadores[1].setorOperador);
-    printf("Nivel: %s\n", listaOperadores[1].nivelOperacional);
-    printf("Status: %s\n", listaOperadores[1].statusOperador);
-    printf("Qtd Operacoes: %d\n", listaOperadores[1].qtdOperacoes);
+    printf("\n=== DEBUG: DADOS NA LISTA [1] ===\n");
+    printf("ID: %d\n", bancoDeDados.listaOperadores[1].idOperador);
+    printf("Nome: %s\n", bancoDeDados.listaOperadores[1].nomeOperador);
+    printf("Setor: %s\n", bancoDeDados.listaOperadores[1].setorOperador);
+    printf("Nivel: %s\n", bancoDeDados.listaOperadores[1].nivelOperacional);
+    printf("Status: %s\n", bancoDeDados.listaOperadores[1].statusOperador);
+    printf("Qtd Operacoes: %d\n", bancoDeDados.listaOperadores[1].qtdOperacoes);
     printf("========================================\n\n");
 
     return 0;
