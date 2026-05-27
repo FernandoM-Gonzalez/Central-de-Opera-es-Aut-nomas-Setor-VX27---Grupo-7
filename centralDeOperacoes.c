@@ -43,12 +43,11 @@ int verificadorNomeRepetido(char nome[], struct Informacoes *info){
 
     //Verifica se tem algum nome igual na Lista de Operadores já Cadastrados
     for(int i = 0; i < TAM_LISTA_OPERADORES; i++){
-        if(info->listaOperadores[i].idOperador != 0){
-            if(strcmp(nome, info->listaOperadores[i].nomeOperador) == 0){
-                return 1;
-            }
+        if(strcmp(strlwr(nome), strlwr(info->listaOperadores[i].nomeOperador)) == 0 || strcmp(strupr(nome), strupr(info->listaOperadores[i].nomeOperador)) == 0 ){
+            return 1;
         }
     }
+
     return 0;
 }
 
@@ -87,7 +86,7 @@ int verificadorNumero(char num[]){
 
 void inserirOperadorNaLista(struct Operador op, struct Informacoes *info){
     for (int i = 0; i < TAM_LISTA_OPERADORES; i++){
-        if(info->listaOperadores[i].idOperador == 0){
+        if(info->listaOperadores[i].idOperador == 0){'
             info->listaOperadores[i] = op;
             info->qtdOperadoresCadastrados++;
             break;
@@ -100,6 +99,8 @@ void cadastroOperador(struct Informacoes *info){
     char leitorStr[50],nomeOperadorTemporario[70],setorOperadorTemporario[6], nivelOperacionalTemporario[20],statusOperadorTemporario[10];
 
     printf("[* Cadastro de Operadores * ]\n");
+
+    //limpaBuffer();
 
     do{
         printf("Nome do Operador: ");
@@ -115,6 +116,7 @@ void cadastroOperador(struct Informacoes *info){
     }while(verificador == 1);
 
     verificador = 0;
+    //limpaBuffer();
 
     do{
         printf("Um setor é composto por 2 Caracteres e 2 Números | Exemplo: TI01 \nSetor do Operador: ");
@@ -130,12 +132,11 @@ void cadastroOperador(struct Informacoes *info){
     }while(verificador == 0);
 
     verificador = 0;
+    //limpaBuffer();
 
     do{
         printf("[ 1 - Básico | 2 - Intermediário | 3 - Supervisor Técnico ]\n Nivel do Operador: ");
-        if(scanf("%d", &leitorNum) != 1){
-            leitorNum = 0;
-        }
+        scanf("%d", &leitorNum);
 
         switch (leitorNum){
             case 1:
@@ -163,9 +164,7 @@ void cadastroOperador(struct Informacoes *info){
 
     do{
         printf("[ 1 - Disponível | 2 - Ocupado | 3 - Inativo | 4 - Bloqueado ]\n Status do Operador: ");
-        if(scanf("%d", &leitorNum) != 1){
-            leitorNum = 0;
-        }
+        scanf("%d", &leitorNum);
 
         switch (leitorNum){
             case 1:
