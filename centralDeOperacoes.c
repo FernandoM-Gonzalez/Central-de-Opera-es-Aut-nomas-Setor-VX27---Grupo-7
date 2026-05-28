@@ -20,6 +20,7 @@ struct Equipamento{
 };
 struct Registros{
  int status;
+ int id;
  char registroTexto[500];
 
 
@@ -27,6 +28,7 @@ struct Registros{
 
 struct Informacoes{
     int qtdOperadoresCadastrados;
+    int qtdRegistrosCriados;
     struct Operador listaOperadores[TAM_LISTA_OPERADORES];
     struct Equipamento listaEquipamentos[TAM_LISTA_EQUIPAMENTOS];
     struct Registros registrosGerais[TAM_LISTA_EQUIPAMENTOS];
@@ -580,6 +582,82 @@ void moverEquipamento(struct Informacoes *bancoDeDados){
 
 }
 
+int verificadorIDRegistro(struct Informacoes *bancoDeDados, int id){
+    for(int i = 0;i<TAM_LISTA_EQUIPAMENTOS;i++){
+        if(bancoDeDados->registrosGerais[i].id == id){
+            return 1;
+
+        }
+
+ }
+ return 0;
+}
+
+
+void criarRegistro(struct Informacoes *bancoDeDados){
+    char texto[500];
+
+    printf("Digite o registro: ");
+    fgets(texto, 500, stdin);
+
+    texto[strcspn(texto, "\n")] = '\0';
+
+    for(int i = 0; i < TAM_LISTA_EQUIPAMENTOS; i++){
+
+        if(bancoDeDados->registrosGerais[i].id == 0){
+
+            bancoDeDados->registrosGerais[i].id =
+            bancoDeDados->qtdRegistrosCriados + 1;
+
+            bancoDeDados->registrosGerais[i].status = 1;
+            strcpy(bancoDeDados->registrosGerais[i].registroTexto,texto);
+            bancoDeDados->qtdRegistrosCriados++;
+
+            break;
+        }
+    }
+
+
+
+}
+
+
+void desativarRegistro(struct Informacoes *bancoDeDados){
+
+    int a;
+    int encontrado = 0;
+
+    do{
+        printf("Digite o ID da Ocorrencia a ser desabilitada: ");
+        scanf("%d", &a);
+        limpaBuffer();
+
+        if(verificadorIDRegistro(bancoDeDados, a) == 0){
+            printf("ID inválido. Tente novamente.\n\n");
+        }
+
+    }while(verificadorIDRegistro(bancoDeDados, a) == 0);
+
+    for(int i = 0; i < TAM_LISTA_EQUIPAMENTOS; i++){
+
+        if(bancoDeDados->registrosGerais[i].id == a){
+
+            bancoDeDados->registrosGerais[i].status = 0;
+
+            encontrado = 1;
+
+            break;
+        }
+    }
+
+}
+
+
+
+
+
+
+
 
 
 
@@ -619,10 +697,10 @@ void atualizar(struct Informacoes *bancoDeDados){
             moverEquipamento(bancoDeDados);
         break;
         case 4:
-
+            criarRegistro(bancoDeDados);
         break;
         case 5:
-
+            desativarRegistro(bancoDeDados);
         break;
         case 6:
             return;
@@ -698,6 +776,14 @@ void menu(struct Informacoes *bancoDeDados){
                 printf("Prioridade: %d\n", bancoDeDados->listaEquipamentos[i].nivelPrioridade);
                 printf("ID Operador Responsavel: %d\n", bancoDeDados->listaEquipamentos[i].idOperadorEquipamento);
                 printf("========================================\n\n");
+
+            }
+            for(int i  = 0;i<2;i++){
+                printf("Ocorencia id: %d\n",bancoDeDados->registrosGerais[i].id);
+                printf("Ocorencia status: %d\n",bancoDeDados->registrosGerais[i].status);
+                printf("Ocorencia: %s\n",bancoDeDados->registrosGerais[i].registroTexto);
+
+
             }
         break;
 
