@@ -432,32 +432,293 @@ void cadastroEquipamento(struct Informacoes *info){
     inserirEquipamentoNaLista(equipamentoTemporario, info);
 }
 
+void atualizarEstadoOperacional(struct Informacoes *bancoDeDados){
+    char id[10];
+    int leitorNum;
+    int verificador;
+    do{
+        printf("Um ID é composto por 1 Caracter e 2 Números | Exemplo: A02\nID do Equipamento: ");
+        fgets(id,10,stdin);
+
+
+        verificador = verificadorPadraoIdEquipamento(id);
+        id[strcspn(id, "\n")] = '\0';
+
+        if(verificador == 0){
+            printf("Valor Inválido.\nTente Novamente.\n\n");
+        }
+    }while(verificador == 0);
+
+    for(int i = 0;i < TAM_LISTA_EQUIPAMENTOS; i++){
+        if(strcmp(id, bancoDeDados->listaEquipamentos[i].idEquipamento)== 0){
+
+        do{
+        printf("Digite o Estado Operacional");
+        printf("[ 1 - Ativo | 2 - Inativo | 3 - Manutenção ]\nEstado Operacional: ");
+        scanf("%d", &leitorNum);
+
+        switch (leitorNum){
+            case 1:
+                strcpy(bancoDeDados->listaEquipamentos[i].estadoOperacional, "Ativo");
+                verificador = 1;
+                break;
+            case 2:
+                strcpy(bancoDeDados->listaEquipamentos[i].estadoOperacional, "Inativo");
+                verificador = 1;
+                break;
+            case 3:
+                strcpy(bancoDeDados->listaEquipamentos[i].estadoOperacional, "Manutencao");
+                verificador = 1;
+                break;
+            default:
+                printf("Opção Inválida. Tente novamente.\n\n");
+                verificador = 0;
+                limpaBuffer();
+                break;
+        }
+    }while(verificador == 0);
+
+
+        }
+
+    }
+
+}
+
+
+void atualizarDisponibilidadeOperador(struct Informacoes *bancoDeDados){
+    int leitorNum;
+    int verificador = 0;
+    printf("Digite o ID do Operador: ");
+    scanf("%d",&leitorNum);
+    for(int i = 0;i < TAM_LISTA_OPERADORES; i++){
+            if(i == bancoDeDados->listaOperadores[0].idOperador){
+                do{
+                    printf("[ 1 - Disponível | 2 - Ocupado | 3 - Inativo | 4 - Bloqueado ]\n Status do Operador: ");
+                    scanf("%d", &leitorNum);
+
+                    switch (leitorNum){
+                        case 1:
+                            strcpy(bancoDeDados->listaOperadores[0].statusOperador, "Disponivel");
+                            verificador = 1;
+                            break;
+                        case 2:
+                            strcpy(bancoDeDados->listaOperadores[0].statusOperador, "Ocupado");
+                            verificador = 1;
+                            break;
+                        case 3:
+                            strcpy(bancoDeDados->listaOperadores[0].statusOperador, "Inativo");
+                            verificador = 1;
+                            break;
+                        case 4:
+                            strcpy(bancoDeDados->listaOperadores[0].statusOperador, "Bloqueado");
+                            verificador = 1;
+                            break;
+                        default:
+                            printf("Opcão Inválida. Tente novamente.\n\n");
+                            limpaBuffer();
+                            verificador = 0;
+                            break;
+                    }
+                }while(verificador == 0);
+        }
+    }
+    return;
+
+
+
+
+
+}
+
+
+void moverEquipamento(struct Informacoes *bancoDeDados){
+    char id[10];
+    char novoSetor[50];
+    int verificador;
+    do{
+        printf("Um ID é composto por 1 Caracter e 2 Números | Exemplo: A02\nID do Equipamento: ");
+        fgets(id,10,stdin);
+
+
+        verificador = verificadorPadraoIdEquipamento(id);
+        id[strcspn(id, "\n")] = '\0';
+
+        if(verificador == 0){
+            printf("Valor Inválido.\nTente Novamente.\n\n");
+        }
+    }while(verificador == 0);
+
+    for(int i = 0;i < TAM_LISTA_EQUIPAMENTOS; i++){
+        if(strcmp(id, bancoDeDados->listaEquipamentos[i].idEquipamento)== 0){
+            do{
+            printf("Digite o novo setor Associado do Equipamento: ");
+            fgets(novoSetor,50,stdin);
+
+            novoSetor[strcspn(novoSetor, "\n")] = '\0';
+
+            verificador = verificadorSetorExistente(novoSetor, bancoDeDados);;
+
+            if(verificador == 0){
+                printf("Valor Inválido.\nTente Novamente.\n\n");
+                limpaBuffer();
+                }
+            }while(verificador == 0);
+
+            strcpy(bancoDeDados->listaEquipamentos[i].setorEquipamento, novoSetor);
+
+        }
+
+    }
+
+}
+
+
+
+
+
+
+
+
+void atualizar(struct Informacoes *bancoDeDados){
+    int a;
+    int op;
+    for(;;){
+
+        printf("1-Altere o Estado Operacional do Equipamento\n");
+        printf("2-Atualize a disponibilidade dos Operadores\n");
+        printf("3-Mover equipamentos entre Setores\n");
+        printf("4-Registrar ocorrências\n");
+        printf("5-Desativar Registros\n");
+        printf("6-Sair");
+
+
+        do
+        {
+            printf("\nSelecione a opção:");
+            a=scanf("%d", &op);
+            limpaBuffer();
+        }while(!a);
+
+       switch (op){
+        case 1:
+            atualizarEstadoOperacional(bancoDeDados);
+        break;
+        case 2:
+            atualizarDisponibilidadeOperador(bancoDeDados);
+        break;
+
+        case 3:
+            moverEquipamento(bancoDeDados);
+        break;
+        case 4:
+
+        break;
+        case 5:
+
+        break;
+        case 6:
+            return;
+        break;
+
+
+
+
+
+       }
+
+
+}
+}
+
+
+void menu(struct Informacoes *bancoDeDados){
+    int a;
+    int opcao;
+    for(;;){
+
+        printf("1-Cadrastra Operadore\n");
+        printf("2-Cadrastra Equipamento\n");
+        printf("3-Atualizar Cadastro\n");
+        printf("4-Consultar Registro\n");
+        printf("5-Relatorio\n");
+
+
+        do
+        {
+            printf("\nSelecione a opção:");
+            a=scanf("%d", &opcao);
+            limpaBuffer();
+        }while(!a);
+
+       switch (opcao){
+        case 1:
+            cadastroOperador(bancoDeDados);
+        break;
+        case 2:
+            cadastroEquipamento(bancoDeDados);
+        break;
+
+        case 3:
+            atualizar(bancoDeDados);
+
+        break;
+        case 4:
+
+
+
+        break;
+        case 1212:
+
+            for(int i = 0;i<2;i++){
+                printf("\n=== DEBUG: DADOS NA LISTA [%d] ===\n",i);
+                printf("ID: %d\n", bancoDeDados->listaOperadores[i].idOperador);
+                printf("Nome: %s\n", bancoDeDados->listaOperadores[i].nomeOperador);
+                printf("Setor: %s\n", bancoDeDados->listaOperadores[i].setorOperador);
+                printf("Nivel: %s\n", bancoDeDados->listaOperadores[i].nivelOperacional);
+                printf("Status: %s\n", bancoDeDados->listaOperadores[i].statusOperador);
+                printf("Qtd Operacoes: %d\n", bancoDeDados->listaOperadores[i].qtdOperacoes);
+                printf("========================================\n\n");
+
+            }
+
+            for(int i = 0;i<2;i++){
+                printf("\n=== DEBUG: EQUIPAMENTO NA LISTA [%d] ===\n",i);
+                printf("ID Equipamento: %s\n", bancoDeDados->listaEquipamentos[i].idEquipamento);
+                printf("Tipo: %s\n", bancoDeDados->listaEquipamentos[i].tipoEquipamento);
+                printf("Setor: %s\n", bancoDeDados->listaEquipamentos[i].setorEquipamento);
+                printf("Estado Operacional: %s\n", bancoDeDados->listaEquipamentos[i].estadoOperacional);
+                printf("Prioridade: %d\n", bancoDeDados->listaEquipamentos[i].nivelPrioridade);
+                printf("ID Operador Responsavel: %d\n", bancoDeDados->listaEquipamentos[i].idOperadorEquipamento);
+                printf("========================================\n\n");
+            }
+        break;
+
+
+
+
+       }
+
+
+
+
+
+    }
+
+
+
+
+}
+
 int main(){
     setlocale(LC_ALL, "Portuguese");
 
     struct Informacoes bancoDeDados = criarBancoDeDados();
 
-    cadastroOperador(&bancoDeDados);
+    menu(&bancoDeDados);
 
-    printf("\n=== DEBUG: DADOS NA LISTA [0] ===\n");
-    printf("ID: %d\n", bancoDeDados.listaOperadores[0].idOperador);
-    printf("Nome: %s\n", bancoDeDados.listaOperadores[0].nomeOperador);
-    printf("Setor: %s\n", bancoDeDados.listaOperadores[0].setorOperador);
-    printf("Nivel: %s\n", bancoDeDados.listaOperadores[0].nivelOperacional);
-    printf("Status: %s\n", bancoDeDados.listaOperadores[0].statusOperador);
-    printf("Qtd Operacoes: %d\n", bancoDeDados.listaOperadores[0].qtdOperacoes);
-    printf("========================================\n\n");
 
-    cadastroEquipamento(&bancoDeDados);
 
-    printf("\n=== DEBUG: EQUIPAMENTO NA LISTA [0] ===\n");
-    printf("ID Equipamento: %s\n", bancoDeDados.listaEquipamentos[0].idEquipamento);
-    printf("Tipo: %s\n", bancoDeDados.listaEquipamentos[0].tipoEquipamento);
-    printf("Setor: %s\n", bancoDeDados.listaEquipamentos[0].setorEquipamento);
-    printf("Estado Operacional: %s\n", bancoDeDados.listaEquipamentos[0].estadoOperacional);
-    printf("Prioridade: %d\n", bancoDeDados.listaEquipamentos[0].nivelPrioridade);
-    printf("ID Operador Responsavel: %d\n", bancoDeDados.listaEquipamentos[0].idOperadorEquipamento);
-    printf("========================================\n\n");
 
     return 0;
 }
