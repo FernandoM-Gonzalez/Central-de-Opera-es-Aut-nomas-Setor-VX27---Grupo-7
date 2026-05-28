@@ -203,7 +203,7 @@ void cadastroOperador(struct Informacoes *info) {
 }
 
 int verificadorPadraoIdEquipamento(char id[]) {
-    if (strlen(id) != 4) {
+    if (strlen(id) != 3) {
         return 0;
     }
     if (isdigit(id[0])) {
@@ -247,19 +247,20 @@ void inserirEquipamentoNaLista(struct Equipamento eq, struct Informacoes *info) 
 
 void cadastroEquipamento(struct Informacoes *info) {
     int verificador = 0, leitorNum = 0, nivelPrioridadeTemporario, idOperadorEquipamentoTemporario;
-    char leitorStr[50], idEquipamentoTemporario[10], tipoEquipamentoTemporario[20], setorEquipamentoTemporario[10], estadoOperacionalTemporario[10];
+    char leitorStr[50], idEquipamentoTemporario[10], tipoEquipamentoTemporario[20], setorEquipamentoTemporario[10], estadoOperacionalTemporario[30];
 
     printf("[* Cadastro de Equipamento * ]\n");
 
     do {
         printf("Um ID é composto por 1 Caracter e 2 Números | Exemplo: A02\nID do Equipamento: ");
         fgets(idEquipamentoTemporario, sizeof(idEquipamentoTemporario), stdin);
+        idEquipamentoTemporario[strcspn(idEquipamentoTemporario, "\n")] = '\0';
         verificador = verificadorPadraoIdEquipamento(idEquipamentoTemporario);
         if (verificador == 0) {
             printf("Valor Inválido.\nTente Novamente.\n\n");
         }
     } while (verificador == 0);
-    idEquipamentoTemporario[strcspn(idEquipamentoTemporario, "\n")] = '\0';
+
 
     verificador = 0;
 
@@ -353,7 +354,6 @@ void cadastroEquipamento(struct Informacoes *info) {
     } while (verificador == 0);
 
     verificador = 0;
-    limpaBuffer();
 
     do {
         printf("[ 1 - Baixa | 2 - Média | 3 - Alta ]\nNivel de Prioridade do Equipamento: ");
