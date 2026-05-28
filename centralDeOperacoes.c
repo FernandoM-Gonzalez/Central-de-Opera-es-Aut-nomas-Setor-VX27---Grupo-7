@@ -18,11 +18,18 @@ struct Equipamento{
     int idOperadorEquipamento, nivelPrioridade;
     char idEquipamento[10], tipoEquipamento[20], setorEquipamento[6], estadoOperacional[10];
 };
+struct Registros{
+ int status;
+ char registroTexto[500];
+
+
+};
 
 struct Informacoes{
     int qtdOperadoresCadastrados;
     struct Operador listaOperadores[TAM_LISTA_OPERADORES];
     struct Equipamento listaEquipamentos[TAM_LISTA_EQUIPAMENTOS];
+    struct Registros registrosGerais[TAM_LISTA_EQUIPAMENTOS];
 };
 
 void limpaBuffer(void){
