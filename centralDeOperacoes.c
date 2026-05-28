@@ -14,7 +14,7 @@ struct Operador {
 
 struct Equipamento {
     int idOperadorEquipamento, nivelPrioridade;
-    char idEquipamento[10], tipoEquipamento[20], setorEquipamento[6], estadoOperacional[10];
+    char idEquipamento[10], tipoEquipamento[20], setorEquipamento[10], estadoOperacional[10];
 };
 
 struct Registros {
@@ -595,6 +595,10 @@ void atualizar(struct Informacoes *bancoDeDados) {
             case 6:
                 return;
                 break;
+            default:
+                printf("Opcao invalida\n");
+            break;
+
         }
     }
 }
@@ -655,12 +659,15 @@ void menu(struct Informacoes *bancoDeDados) {
                     printf("Ocorencia: %s\n", bancoDeDados->registrosGerais[i].registroTexto);
                 }
                 break;
+                default:
+                    printf("Opcao invalida\n");
+                break;
         }
     }
 }
 
 int main() {
-    setlocale(LC_ALL, "Portuguese");
+    setlocale(LC_ALL, "");
     struct Informacoes bancoDeDados = criarBancoDeDados();
     menu(&bancoDeDados);
     return 0;
