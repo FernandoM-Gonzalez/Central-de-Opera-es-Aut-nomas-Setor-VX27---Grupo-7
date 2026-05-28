@@ -43,7 +43,7 @@ int verificadorNomeRepetido(char nome[], struct Informacoes *info){
 
     //Verifica se tem algum nome igual na Lista de Operadores já Cadastrados
     for(int i = 0; i < TAM_LISTA_OPERADORES; i++){
-        if(strcmp(strlwr(nome), strlwr(info->listaOperadores[i].nomeOperador)) == 0 || strcmp(strupr(nome), strupr(info->listaOperadores[i].nomeOperador)) == 0 ){
+        if(strcasecmp(nome, info->listaOperadores[i].nomeOperador) == 0){
             return 1;
         }
     }
@@ -100,8 +100,6 @@ void cadastroOperador(struct Informacoes *info){
 
     printf("[* Cadastro de Operadores * ]\n");
 
-    //limpaBuffer();
-
     do{
         printf("Nome do Operador: ");
         fgets(nomeOperadorTemporario,70,stdin);
@@ -116,10 +114,9 @@ void cadastroOperador(struct Informacoes *info){
     }while(verificador == 1);
 
     verificador = 0;
-    //limpaBuffer();
 
     do{
-        printf("Um setor é composto por 2 Caracteres e 2 Números | Exemplo: TI01 \nSetor do Operador: ");
+        printf("Um setor é composto por 2 Caracteres e 2 Números | Exemplo: TI01\nSetor do Operador: ");
         fgets(setorOperadorTemporario,10,stdin);
 
         setorOperadorTemporario[strcspn(setorOperadorTemporario, "\n")] = '\0';
@@ -132,7 +129,6 @@ void cadastroOperador(struct Informacoes *info){
     }while(verificador == 0);
 
     verificador = 0;
-    //limpaBuffer();
 
     do{
         printf("[ 1 - Básico | 2 - Intermediário | 3 - Supervisor Técnico ]\n Nivel do Operador: ");
@@ -223,7 +219,6 @@ void cadastroOperador(struct Informacoes *info){
 }
 
 int verificadorPadraoIdEquipamento(char id[]){
-    //Verifica o Tamanho da String
     if(strlen(id) != 4){
         return 0;
     }
@@ -232,7 +227,6 @@ int verificadorPadraoIdEquipamento(char id[]){
         return 0;
     }
 
-    //Verifica se os 2 ultimos digitos não são Digitos Numéricos
     if(!isdigit(id[1]) || !isdigit(id[2])){
         return 0;
     }
@@ -241,8 +235,17 @@ int verificadorPadraoIdEquipamento(char id[]){
 
 int verificadorSetorExistente(char setor[], struct Informacoes *info){
     for(int i = 0; i < TAM_LISTA_OPERADORES; i++){
+        if(strcasecmp(setor, info->listaOperadores[i].setorOperador) == 0){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int verificadorIdExistente(int id, struct Informacoes *info){
+    for(int i = 0; i < TAM_LISTA_OPERADORES; i++){
         if(info->listaOperadores[i].idOperador != 0){
-            if(strcasecmp(setor, info->listaOperadores[i].setorOperador) == 0){
+            if(id == info->listaOperadores[i].idOperador){
                 return 1;
             }
         }
@@ -250,6 +253,14 @@ int verificadorSetorExistente(char setor[], struct Informacoes *info){
     return 0;
 }
 
+void inserirEquipamentoNaLista(struct Equipamento eq, struct Informacoes *info){
+    for (int i = 0; i < TAM_LISTA_EQUIPAMENTOS; i++){
+        if(info->listaEquipamentos[i].idEquipamento[0] == '\0'){
+            info->listaEquipamentos[i] = eq;
+            break;
+        }
+    }
+}
 
 void cadastroEquipamento(struct Informacoes *info){
     int verificador = 0, leitorNum = 0, nivelPrioridadeTemporario, idOperadorEquipamentoTemporario;
@@ -258,7 +269,7 @@ void cadastroEquipamento(struct Informacoes *info){
     printf("[* Cadastro de Equipamento * ]\n");
 
     do{
-        printf("Um ID é composto por 1 Caracter e 2 Números | Exemplo: A02 \nID do Equipamento: ");
+        printf("Um ID é composto por 1 Caracter e 2 Números | Exemplo: A02\nID do Equipamento: ");
         fgets(idEquipamentoTemporario,10,stdin);
 
         verificador = verificadorPadraoIdEquipamento(idEquipamentoTemporario);
@@ -273,7 +284,7 @@ void cadastroEquipamento(struct Informacoes *info){
     verificador = 0;
 
     do{
-        printf("[ 1 - Drone | 2 - Sensor | 3 - Scanner | 4 - Braço Robótico ]\n Categoria Operacional: ");
+        printf("[ 1 - Drone | 2 - Sensor | 3 - Scanner | 4 - Braço Robótico ]\nCategoria Operacional: ");
         scanf("%d", &leitorNum);
 
         switch (leitorNum){
@@ -305,40 +316,126 @@ void cadastroEquipamento(struct Informacoes *info){
     verificador = 0;
 
     do{
-        printf("ID do Operador do Equipamento: ");
-        fgets(leitorStr,50,stdin);
+        printf("Setor Associado do Equipamento: ");
+        fgets(setorEquipamentoTemporario,50,stdin);
 
-        leitorStr[strcspn(leitorStr, "\n")] = '\0';
+        setorEquipamentoTemporario[strcspn(setorEquipamentoTemporario, "\n")] = '\0';
 
-        verificador = verificadorSetorExistente(leitorStr, info);
+        verificador = verificadorSetorExistente(setorEquipamentoTemporario, info);
 
         if(verificador == 0){
             printf("Valor Inválido.\nTente Novamente.\n\n");
+            limpaBuffer();
         }
     }while(verificador == 0);
 
-    idOperadorEquipamentoTemporario = atoi(leitorStr);
+    verificador = 0;
 
+    do{
+        printf("[ 1 - Ativo | 2 - Inativo | 3 - Manutenção ]\nEstado Operacional: ");
+        scanf("%d", &leitorNum);
 
+        switch (leitorNum){
+            case 1:
+                strcpy(estadoOperacionalTemporario, "Ativo");
+                verificador = 1;
+                break;
+            case 2:
+                strcpy(estadoOperacionalTemporario, "Inativo");
+                verificador = 1;
+                break;
+            case 3:
+                strcpy(estadoOperacionalTemporario, "Manutencao");
+                verificador = 1;
+                break;
+            default:
+                printf("Opção Inválida. Tente novamente.\n\n");
+                verificador = 0;
+                limpaBuffer();
+                break;
+        }
+    }while(verificador == 0);
 
+    limpaBuffer();
+    verificador = 0;
+
+    do{
+        printf("ID do Operador responsável (Número de 1 a 50): ");
+        fgets(leitorStr, 50, stdin);
+
+        leitorStr[strcspn(leitorStr, "\n")] = '\0';
+
+        verificador = verificadorNumero(leitorStr);
+
+        if(verificador == 0){
+            printf("Opção Inválida. Tente novamente.\n\n");
+            limpaBuffer();
+        }else{
+            idOperadorEquipamentoTemporario = atoi(leitorStr);
+
+            verificador = verificadorIdExistente(idOperadorEquipamentoTemporario, info);
+
+            if(verificador == 0){
+                printf("Operador não encontrado ou inválido.\nTente Novamente.\n\n");
+                limpaBuffer();
+            }
+        }
+    }while(verificador == 0);
+
+    verificador = 0;
+    limpaBuffer();
+
+    do{
+        printf("[ 1 - Baixa | 2 - Média | 3 - Alta ]\nNivel de Prioridade do Equipamento: ");
+        fgets(leitorStr, 50, stdin);
+
+        leitorStr[strcspn(leitorStr, "\n")] = '\0';
+
+        verificador = verificadorNumero(leitorStr);
+
+        if(verificador == 0){
+            printf("Opção Inválida. Tente novamente.\n\n");
+        }else{
+            leitorNum = atoi(leitorStr);
+        }
+
+        switch (leitorNum){
+            case 1:
+                nivelPrioridadeTemporario = 1;
+                verificador = 1;
+                break;
+            case 2:
+                nivelPrioridadeTemporario = 2;
+                verificador = 1;
+                break;
+            case 3:
+                nivelPrioridadeTemporario = 3;
+                verificador = 1;
+                break;
+            default:
+                printf("Opção Inválida. Tente novamente.\n\n");
+                verificador = 0;
+                limpaBuffer();
+                break;
+        }
+    }while(verificador == 0);
+
+    struct Equipamento equipamentoTemporario;
+
+    equipamentoTemporario.idOperadorEquipamento = idOperadorEquipamentoTemporario;
+    equipamentoTemporario.nivelPrioridade = nivelPrioridadeTemporario;
+    strcpy(equipamentoTemporario.idEquipamento, idEquipamentoTemporario);
+    strcpy(equipamentoTemporario.tipoEquipamento, tipoEquipamentoTemporario);
+    strcpy(equipamentoTemporario.setorEquipamento, setorEquipamentoTemporario);
+    strcpy(equipamentoTemporario.estadoOperacional, estadoOperacionalTemporario);
+
+    inserirEquipamentoNaLista(equipamentoTemporario, info);
 }
-
-
-
-
-
-
 
 int main(){
     setlocale(LC_ALL, "Portuguese");
 
     struct Informacoes bancoDeDados = criarBancoDeDados();
-
-    cadastroOperador(&bancoDeDados);
-    cadastroEquipamento(&bancoDeDados);
-
-    /*
-
 
     cadastroOperador(&bancoDeDados);
 
@@ -351,15 +448,16 @@ int main(){
     printf("Qtd Operacoes: %d\n", bancoDeDados.listaOperadores[0].qtdOperacoes);
     printf("========================================\n\n");
 
-    printf("\n=== DEBUG: DADOS NA LISTA [1] ===\n");
-    printf("ID: %d\n", bancoDeDados.listaOperadores[1].idOperador);
-    printf("Nome: %s\n", bancoDeDados.listaOperadores[1].nomeOperador);
-    printf("Setor: %s\n", bancoDeDados.listaOperadores[1].setorOperador);
-    printf("Nivel: %s\n", bancoDeDados.listaOperadores[1].nivelOperacional);
-    printf("Status: %s\n", bancoDeDados.listaOperadores[1].statusOperador);
-    printf("Qtd Operacoes: %d\n", bancoDeDados.listaOperadores[1].qtdOperacoes);
+    cadastroEquipamento(&bancoDeDados);
+
+    printf("\n=== DEBUG: EQUIPAMENTO NA LISTA [0] ===\n");
+    printf("ID Equipamento: %s\n", bancoDeDados.listaEquipamentos[0].idEquipamento);
+    printf("Tipo: %s\n", bancoDeDados.listaEquipamentos[0].tipoEquipamento);
+    printf("Setor: %s\n", bancoDeDados.listaEquipamentos[0].setorEquipamento);
+    printf("Estado Operacional: %s\n", bancoDeDados.listaEquipamentos[0].estadoOperacional);
+    printf("Prioridade: %d\n", bancoDeDados.listaEquipamentos[0].nivelPrioridade);
+    printf("ID Operador Responsavel: %d\n", bancoDeDados.listaEquipamentos[0].idOperadorEquipamento);
     printf("========================================\n\n");
-    */
 
     return 0;
 }
