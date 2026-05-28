@@ -16,7 +16,7 @@ struct Operador{
 
 struct Equipamento{
     int idOperadorEquipamento, nivelPrioridade;
-    char idEquipamento[100], tipoEquipamento[20], setorEquipamento[6], estadoOperacional[10];
+    char idEquipamento[10], tipoEquipamento[20], setorEquipamento[6], estadoOperacional[10];
 };
 
 struct Informacoes{
@@ -86,7 +86,7 @@ int verificadorNumero(char num[]){
 
 void inserirOperadorNaLista(struct Operador op, struct Informacoes *info){
     for (int i = 0; i < TAM_LISTA_OPERADORES; i++){
-        if(info->listaOperadores[i].idOperador == 0){'
+        if(info->listaOperadores[i].idOperador == 0){
             info->listaOperadores[i] = op;
             info->qtdOperadoresCadastrados++;
             break;
@@ -222,12 +222,124 @@ void cadastroOperador(struct Informacoes *info){
     inserirOperadorNaLista(operadorTemporario, info);
 }
 
+int verificadorPadraoIdEquipamento(char id[]){
+    //Verifica o Tamanho da String
+    if(strlen(id) != 4){
+        return 0;
+    }
+
+    if(isdigit(id[0])){
+        return 0;
+    }
+
+    //Verifica se os 2 ultimos digitos não são Digitos Numéricos
+    if(!isdigit(id[1]) || !isdigit(id[2])){
+        return 0;
+    }
+    return 1;
+}
+
+int verificadorSetorExistente(char setor[], struct Informacoes *info){
+    for(int i = 0; i < TAM_LISTA_OPERADORES; i++){
+        if(info->listaOperadores[i].idOperador != 0){
+            if(strcasecmp(setor, info->listaOperadores[i].setorOperador) == 0){
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+
+void cadastroEquipamento(struct Informacoes *info){
+    int verificador = 0, leitorNum = 0, nivelPrioridadeTemporario, idOperadorEquipamentoTemporario;
+    char leitorStr[50],idEquipamentoTemporario[10], tipoEquipamentoTemporario[20], setorEquipamentoTemporario[6], estadoOperacionalTemporario[10];
+
+    printf("[* Cadastro de Equipamento * ]\n");
+
+    do{
+        printf("Um ID é composto por 1 Caracter e 2 Números | Exemplo: A02 \nID do Equipamento: ");
+        fgets(idEquipamentoTemporario,10,stdin);
+
+        verificador = verificadorPadraoIdEquipamento(idEquipamentoTemporario);
+
+        if(verificador == 0){
+            printf("Valor Inválido.\nTente Novamente.\n\n");
+        }
+    }while(verificador == 0);
+
+    idEquipamentoTemporario[strcspn(idEquipamentoTemporario, "\n")] = '\0';
+
+    verificador = 0;
+
+    do{
+        printf("[ 1 - Drone | 2 - Sensor | 3 - Scanner | 4 - Braço Robótico ]\n Categoria Operacional: ");
+        scanf("%d", &leitorNum);
+
+        switch (leitorNum){
+            case 1:
+                strcpy(tipoEquipamentoTemporario, "Drone");
+                verificador = 1;
+                break;
+            case 2:
+                strcpy(tipoEquipamentoTemporario, "Sensor");
+                verificador = 1;
+                break;
+            case 3:
+                strcpy(tipoEquipamentoTemporario, "Scanner");
+                verificador = 1;
+                break;
+            case 4:
+                strcpy(tipoEquipamentoTemporario, "Braco Robotico");
+                verificador = 1;
+                break;
+            default:
+                printf("Opção Inválida. Tente novamente.\n\n");
+                verificador = 0;
+                limpaBuffer();
+                break;
+        }
+    }while(verificador == 0);
+
+    limpaBuffer();
+    verificador = 0;
+
+    do{
+        printf("ID do Operador do Equipamento: ");
+        fgets(leitorStr,50,stdin);
+
+        leitorStr[strcspn(leitorStr, "\n")] = '\0';
+
+        verificador = verificadorSetorExistente(leitorStr, info);
+
+        if(verificador == 0){
+            printf("Valor Inválido.\nTente Novamente.\n\n");
+        }
+    }while(verificador == 0);
+
+    idOperadorEquipamentoTemporario = atoi(leitorStr);
+
+
+
+}
+
+
+
+
+
+
+
 int main(){
     setlocale(LC_ALL, "Portuguese");
 
     struct Informacoes bancoDeDados = criarBancoDeDados();
 
     cadastroOperador(&bancoDeDados);
+    cadastroEquipamento(&bancoDeDados);
+
+    /*
+
+
     cadastroOperador(&bancoDeDados);
 
     printf("\n=== DEBUG: DADOS NA LISTA [0] ===\n");
@@ -247,6 +359,7 @@ int main(){
     printf("Status: %s\n", bancoDeDados.listaOperadores[1].statusOperador);
     printf("Qtd Operacoes: %d\n", bancoDeDados.listaOperadores[1].qtdOperacoes);
     printf("========================================\n\n");
+    */
 
     return 0;
 }
